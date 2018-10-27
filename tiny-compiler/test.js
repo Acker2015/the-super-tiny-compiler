@@ -1,6 +1,22 @@
-//import * as Compiler from './tiny-compiler-by-acker.js'
-var compiler = require('./tiny-compiler-by-acker');
+/**
+ input: (add 2 (subtract 4 2))
+ tokens:
+[ { type: 'paren', value: '(' },
+  { type: 'operator', value: 'add' },
+  { type: 'number', value: '2' },
+  { type: 'paren', value: '(' },
+  { type: 'operator', value: 'subtract' },
+  { type: 'number', value: '4' },
+  { type: 'number', value: '2' },
+  { type: 'paren', value: ')' },
+  { type: 'paren', value: ')' } ]
+ */
 
-var ce = '(add 2 (subtract 4 2))';
-var tokens = compiler.tokenizer(ce);
+var compiler = require('./tiny-compiler-by-acker');
+var args = process.argv.splice(2);
+if (args == null || args.length <= 0) {
+    throw new Error('you have to input at least one argv.');
+}
+var expression = args[0];
+var tokens = compiler.tokenizer(expression);
 console.log(tokens);
