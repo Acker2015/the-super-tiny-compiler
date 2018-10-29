@@ -49,6 +49,7 @@ var symbol = {
     operator: 'operator',
     paren: 'paren'
 }
+
 function tokenizer(input) {
     var current = 0;
     var tokens = [];
@@ -149,7 +150,41 @@ function tokenizer(input) {
     return ast;
 }
 
+/**
+ * C代码生成
+ * @param {ast} node 
+ * @return string
+ * input:  (add 2 (subtract 4 2))
+ * output: add(2, subtract(4, 2)) 
+ */
+function codeGenerator(node) {
+    switch(node.type) {
+        case 'Program':
+            return node.body.map(codeGenerator).join('\n');
+        case 'CallExpression':
+            return node.name + '(' + node.params.map(codeGenerator).join(', ') + ')';
+        case 'NumberLiteral':
+            return node.value;
+        default:
+            throw new TypeError(node.type);
+    }
+}
+
+/**
+ * 编译入口
+ * @param {LISP表达式}} input 
+ * @return {C表达式}
+ */
+function compiler(input) {
+    var tokens = tokenizer(input);
+    var ast = parser(tokens);
+    var output = codeGenerator(ast);
+    return output;
+}
+
 module.exports = {
     tokenizer: tokenizer,
-    parser: parser
+    parser: parser,
+    codeGenerator: codeGenerator,
+    compiler: compiler
 }
