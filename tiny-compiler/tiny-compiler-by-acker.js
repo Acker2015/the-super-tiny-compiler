@@ -103,6 +103,53 @@ function tokenizer(input) {
     return tokens;
 }
 
+ /**
+  * 词法分析 tokens -> AST
+  * @param {token数组} tokens 
+  */
+ function parser(tokens) {
+    var current = 0;
+    function walk() {
+        var token = tokens[current];
+        if (token.type === symbol.number) {
+            current++;
+            return {
+                type: 'NumberLiteral',
+                value: token.value
+            };
+        }
+        // CallExpression, 发现左括号
+        if (token.type === symbol.paren && token.value === '(') {
+            token = tokens[++current];
+            var node = {
+                type: 'CallExpression',
+                name: token.value,          // 操作符
+                params: []
+            };
+            token = tokens[++current];
+            while(
+                token.type !== symbol.paren ||
+                (token.type === symbol.paren && token.value !== ')')
+            ) {
+                node.params.push(walk());
+                token = tokens[current];
+            }
+            current++;
+            return node;
+        }
+        throw new TypeError(token.type);
+    }
+    var ast = {
+        type: 'Program',
+        body: []
+    }
+    while(current < tokens.length) {
+        ast.body.push(walk());
+    }
+    return ast;
+}
+
 module.exports = {
-    tokenizer: tokenizer
+    tokenizer: tokenizer,
+    parser: parser
 }

@@ -20,3 +20,6 @@ if (args == null || args.length <= 0) {
 var expression = args[0];
 var tokens = compiler.tokenizer(expression);
 console.log(tokens);
+var ast = compiler.parser(tokens);
+console.log(ast);
+console.log(ast.body[0].params);
